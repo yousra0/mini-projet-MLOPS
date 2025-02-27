@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Cloner le dépôt
+        uses: actions/checkout@v3
+
+      - name: 🔧 Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Installer les dépendances
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: 🧹 Lint du code
+        run: |
+          source venv/bin/activate
+          make lint
+
+      - name: 📊 Exécuter les tests unitaires
+        run: |
+          source venv/bin/activate
+          make test
+
+      - name: 🚀 Entraîner le modèle
+        run: |
+          source venv/bin/activate
+          make train
+
+      - name: ✅ Notification de succès
+        run: echo "Le pipeline CI/CD s'est terminé avec succès."

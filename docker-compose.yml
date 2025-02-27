@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+
+
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"  # Expose le port pour accéder à l'interface
+    volumes:
+      - /:/rootfs:ro  # Accès en lecture seule au système de fichiers root
+      - /var/run:/var/run:ro  # Accès en lecture seule aux sockets Docker
+      - /sys:/sys:ro  # Accès aux statistiques système
+      - /var/lib/docker/:/var/lib/docker:ro  # Accès aux données Docker
+    command:
+      - "--disable_metrics=percpu,hugetlb,referenced_memory"
+      - "--disable_auth=true"
+    privileged: true
+    restart: unless-stopped  # Redémarre automatiquement si le conteneur s'arrête
+
+
+
+
+volumes:
+  esdata:
+    driver: local

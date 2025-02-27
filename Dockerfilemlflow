@@ -1,0 +1,16 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Installer les dépendances
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copier le code
+COPY . .
+
+# Exposer le port pour MLflow
+EXPOSE 5000
+
+# Commande pour lancer MLflow
+CMD ["mlflow", "server", "--backend-store-uri", "sqlite:///mlflow.db", "--default-artifact-root", "./mlruns", "--host", "0.0.0.0", "--port", "5000"]
