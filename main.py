@@ -4,6 +4,15 @@ import argparse
 import time
 from model_pipeline import prepare_data, train_model, evaluate_model, save_model, load_model
 from mlflow.tracking import MlflowClient
+from fastapi import FastAPI
+import uvicorn
+
+#configuration de FastAPI
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello, FastAPI!"}
 
 # 📌 Configuration de MLflow
 print("\n" + "—"*80)
